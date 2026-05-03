@@ -2,3 +2,10 @@ cache/
 *.pkl
 .ipynb_checkpoints/
 __pycache__/
+2022/
+2023/
+2024/
+2025/
+2026/
+f1_race_results_partial.csv
+fastf1_http_cache.sqlite
