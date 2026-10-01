@@ -1,0 +1,339 @@
+{
+ "search": {
+  "feats": [
+   "LogGrid",
+   "RecentForm",
+   "RecentPodiumRate",
+   "TeamForm",
+   "GridXTeam",
+   "SeasonPts"
+  ],
+  "half_life": null,
+  "trials": [
+   {
+    "change": "Starting point (notebook features, fixed)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm"
+    ],
+    "hl": null,
+    "select": 0.2157,
+    "kept": true
+   },
+   {
+    "change": "Add Team development trend",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "TeamTrend"
+    ],
+    "hl": null,
+    "select": 0.2162,
+    "kept": false
+   },
+   {
+    "change": "Add Beating the teammate",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "TeammateDelta"
+    ],
+    "hl": null,
+    "select": 0.2157,
+    "kept": false
+   },
+   {
+    "change": "Add Long-run form (10 races)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "LongForm"
+    ],
+    "hl": null,
+    "select": 0.2155,
+    "kept": false
+   },
+   {
+    "change": "Add Record at this circuit",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "TrackHistory"
+    ],
+    "hl": null,
+    "select": 0.2169,
+    "kept": false
+   },
+   {
+    "change": "Add Points per race this season",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "SeasonPts"
+    ],
+    "hl": null,
+    "select": 0.2143,
+    "kept": false
+   },
+   {
+    "change": "Add Grid × team strength",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam"
+    ],
+    "hl": null,
+    "select": 0.2143,
+    "kept": true
+   },
+   {
+    "change": "Add Team development trend",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "TeamTrend"
+    ],
+    "hl": null,
+    "select": 0.2148,
+    "kept": false
+   },
+   {
+    "change": "Add Beating the teammate",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "TeammateDelta"
+    ],
+    "hl": null,
+    "select": 0.2143,
+    "kept": false
+   },
+   {
+    "change": "Add Long-run form (10 races)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "LongForm"
+    ],
+    "hl": null,
+    "select": 0.2141,
+    "kept": false
+   },
+   {
+    "change": "Add Record at this circuit",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "TrackHistory"
+    ],
+    "hl": null,
+    "select": 0.2157,
+    "kept": false
+   },
+   {
+    "change": "Add Points per race this season",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts"
+    ],
+    "hl": null,
+    "select": 0.213,
+    "kept": true
+   },
+   {
+    "change": "Add Team development trend",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts",
+     "TeamTrend"
+    ],
+    "hl": null,
+    "select": 0.2134,
+    "kept": false
+   },
+   {
+    "change": "Add Beating the teammate",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts",
+     "TeammateDelta"
+    ],
+    "hl": null,
+    "select": 0.2138,
+    "kept": false
+   },
+   {
+    "change": "Add Long-run form (10 races)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts",
+     "LongForm"
+    ],
+    "hl": null,
+    "select": 0.2136,
+    "kept": false
+   },
+   {
+    "change": "Add Record at this circuit",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts",
+     "TrackHistory"
+    ],
+    "hl": null,
+    "select": 0.2142,
+    "kept": false
+   },
+   {
+    "change": "Weight recent races (half-life 60 races)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts"
+    ],
+    "hl": 60,
+    "select": 0.2136,
+    "kept": false
+   },
+   {
+    "change": "Weight recent races (half-life 30 races)",
+    "feats": [
+     "LogGrid",
+     "RecentForm",
+     "RecentPodiumRate",
+     "TeamForm",
+     "GridXTeam",
+     "SeasonPts"
+    ],
+    "hl": 30,
+    "select": 0.2143,
+    "kept": false
+   }
+  ],
+  "select_races": 69,
+  "holdout_races": 16,
+  "baseline": {
+   "all": {
+    "races": 85,
+    "hits": 174,
+    "grid": 171,
+    "logloss": 0.2154
+   },
+   "holdout": {
+    "races": 16,
+    "hits": 29,
+    "grid": 30,
+    "logloss": 0.2138
+   }
+  },
+  "champion": {
+   "all": {
+    "races": 85,
+    "hits": 176,
+    "grid": 171,
+    "logloss": 0.2122
+   },
+   "holdout": {
+    "races": 16,
+    "hits": 30,
+    "grid": 30,
+    "logloss": 0.2087
+   }
+  }
+ },
+ "races": 107,
+ "scoreHistory": [
+  {
+   "ts": "2026-09-30T15:02:52Z",
+   "races": 107,
+   "feats": [
+    "LogGrid",
+    "RecentForm",
+    "RecentPodiumRate",
+    "TeamForm",
+    "GridXTeam",
+    "SeasonPts"
+   ],
+   "hl": null,
+   "champion": {
+    "all": {
+     "races": 85,
+     "hits": 176,
+     "grid": 171,
+     "logloss": 0.2122
+    },
+    "holdout": {
+     "races": 16,
+     "hits": 30,
+     "grid": 30,
+     "logloss": 0.2087
+    }
+   },
+   "baseline": {
+    "all": {
+     "races": 85,
+     "hits": 174,
+     "grid": 171,
+     "logloss": 0.2154
+    },
+    "holdout": {
+     "races": 16,
+     "hits": 29,
+     "grid": 30,
+     "logloss": 0.2138
+    }
+   }
+  }
+ ],
+ "version": "90125e6a0c",
+ "intelSeen": "2026-09-30T15:30:00Z"
+}

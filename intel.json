@@ -1,0 +1,32 @@
+{
+ "updated": "2026-09-30T15:30:00Z",
+ "event": "2026 Bahrain Grand Prix",
+ "grid_penalties": {"COL": 5},
+ "items": [
+  {"date": "2026-09-29", "kind": "penalty", "driver": "COL", "team": "Alpine",
+   "title": "Colapinto starts 5 places back",
+   "summary": "Stewards gave Colapinto a 5-place grid drop for causing a collision in Baku. The model applies it to the qualifying order.",
+   "source": "Pitpass", "url": "https://www.pitpass.com/83638/A-grid-penalty-for-Colapinto", "applied": true},
+  {"date": "2026-09-30", "kind": "upgrade", "team": "Mercedes",
+   "title": "Mercedes bring another W17 upgrade",
+   "summary": "The fastest car of 2026 gets a further update for Sepang.",
+   "source": "Formula1.com", "url": "https://www.formula1.com/en/latest/article/its-race-week-5-storylines-were-excited-about-ahead-of-the-2026-bahrain-grand-prix-in-malaysia.5VJ800Id8hGFvoRpQQFc9u", "applied": false},
+  {"date": "2026-09-30", "kind": "upgrade", "team": "McLaren",
+   "title": "McLaren: circuit-specific bodywork only",
+   "summary": "After a big package in Azerbaijan, McLaren bring smaller, Sepang-specific parts. Baku was a pointless weekend for them, down on straight-line speed.",
+   "source": "McLaren", "url": "https://www.mclaren.com/racing/formula-1/2026/bahrain-grand-prix-in-malaysia/preview/", "applied": false},
+  {"date": "2026-09-26", "kind": "watch", "driver": "VER", "team": "Red Bull Racing",
+   "title": "Verstappen expects an engine penalty soon",
+   "summary": "He says a power unit penalty is coming, but no race is confirmed yet. Not applied until the stewards confirm it.",
+   "source": "RacingNews365", "url": "https://racingnews365.com/verstappen-confirms-upcoming-grid-penalty", "applied": false},
+  {"date": "2026-09-30", "kind": "weather", "title": "Rain is likely, especially Sunday",
+   "summary": "Forecasts give up to a 90% chance of rain on race day and a 33°C high on Saturday. The model has no weather input, so a wet race makes it less reliable.",
+   "source": "PlanetF1", "url": "https://www.planetf1.com/news/f1-malaysia-gp-bahrain-2026-weather-forecast", "applied": false},
+  {"date": "2026-09-30", "kind": "venue", "title": "First F1 race at Sepang since 2017",
+   "summary": "The Bahrain GP moved to Malaysia after the April race was cancelled. No driver has Sepang history in this dataset, so the circuit-record feature is neutral.",
+   "source": "Motorsport.com", "url": "https://www.motorsport.com/f1/news/why-is-the-2026-bahrain-grand-prix-taking-place-in-malaysia/10859526/", "applied": false},
+  {"date": "2026-09-27", "kind": "result", "title": "Baku: Russell beats Verstappen by 0.1s",
+   "summary": "Russell led from lights to flag. Hadjar made it a Red Bull double podium; six drivers retired, including Norris.",
+   "source": "Formula1.com", "url": "https://www.formula1.com/en/latest/article/russell-narrowly-holds-off-verstappen-to-take-victory-over-the-line-in-chaotic-azerbaijan-gp.5J4lgNh82JDL2GM302irF0", "applied": false}
+ ]
+}
