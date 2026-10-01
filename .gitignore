@@ -9,3 +9,4 @@ __pycache__/
 2026/
 f1_race_results_partial.csv
 fastf1_http_cache.sqlite
+f1_race_results_full.orig.csv

@@ -1,0 +1,727 @@
+<meta charset="utf-8">
+<title>Podium Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #eceef1; --panel: #ffffff; --ink: #14171c; --muted: #5d6572; --line: #d6dae1; --track: #e4e7ec;
+    --hit: #8a3fd1; --hit-soft: #f1e7fb; --hit-ink: #ffffff; --base: #b07800; --base-soft: #fbf1dc;
+    --live: #d0102b; --good: #1d8a4e; --focus: #2b6de0;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+    --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0f1216; --panel: #171b21; --ink: #e8ebf0; --muted: #8f98a6; --line: #2a3039; --track: #242a33;
+      --hit: #b57cf3; --hit-soft: #2b2140; --hit-ink: #14091f; --base: #e3ac34; --base-soft: #2e2615;
+      --live: #ff4d63; --good: #45c483; --focus: #6aa0ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1216; --panel: #171b21; --ink: #e8ebf0; --muted: #8f98a6; --line: #2a3039; --track: #242a33;
+    --hit: #b57cf3; --hit-soft: #2b2140; --hit-ink: #14091f; --base: #e3ac34; --base-soft: #2e2615;
+    --live: #ff4d63; --good: #45c483; --focus: #6aa0ff;
+  }
+
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); padding-inline: 16px; padding-block: 28px 56px; }
+  .wrap { max-width: 1080px; margin-inline: auto; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .label { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+  section { margin-top: 44px; }
+  h2.sec { font: 700 30px/1 var(--display); text-transform: uppercase; margin: 0 0 6px; text-wrap: balance; }
+  .sec-sub { color: var(--muted); margin: 0 0 16px; max-width: 68ch; text-wrap: pretty; }
+
+  /* header */
+  .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+  h1 { font: italic 700 clamp(48px, 8vw, 80px)/.9 var(--display); letter-spacing: -.01em; margin: 10px 0 0; text-transform: uppercase; }
+  .built { text-align: right; }
+  .built b { display: block; font: 600 14px var(--mono); margin-top: 6px; }
+
+  /* since last visit */
+  .news-bar { margin-top: 22px; padding: 14px 18px; display: grid; gap: 10px; }
+  .news-bar header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .news-bar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .news-bar li { display: grid; grid-template-columns: 96px 1fr; gap: 12px; font-size: 14px; }
+  .news-bar li .when { font: 12px var(--mono); color: var(--muted); padding-top: 2px; }
+  .kind { font: 600 10.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 3px 5px; border-radius: 2px; background: var(--track); color: var(--muted); margin-right: 6px; vertical-align: 1px; }
+  .kind.session, .kind.prediction { background: var(--hit-soft); color: var(--hit); }
+  .kind.result, .kind.scored { background: var(--ink); color: var(--bg); }
+  .kind.model { background: var(--base-soft); color: var(--base); }
+  .kind.news, .kind.penalty, .kind.weather { background: color-mix(in srgb, var(--live) 14%, transparent); color: var(--live); }
+  .newdot { width: 8px; height: 8px; border-radius: 50%; background: var(--live); display: inline-block; margin-right: 8px; }
+  .linkbtn { background: none; border: 0; padding: 0; font: 600 12px var(--mono); color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* next race */
+  .race-hero { margin-top: 26px; overflow: hidden; }
+  .hero-top { padding: 20px 22px; display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: space-between; align-items: end; border-bottom: 1px solid var(--line); }
+  .hero-top h2 { font: 700 clamp(34px, 5vw, 50px)/.95 var(--display); text-transform: uppercase; margin: 8px 0 0; text-wrap: balance; }
+  .hero-top .where { color: var(--muted); margin-top: 6px; }
+  .live-dot { display: inline-flex; align-items: center; gap: 7px; color: var(--live); }
+  .live-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--live); animation: pulse 2s var(--ease-out) infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  .countdown { text-align: right; }
+  .countdown .big { font: 700 34px/1 var(--display); font-variant-numeric: tabular-nums; margin-top: 6px; }
+
+  .timeline { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+  .tl { padding: 12px 14px; display: grid; gap: 3px; position: relative; }
+  .tl + .tl { border-left: 1px solid var(--line); }
+  .tl .n { font: 700 18px/1 var(--display); letter-spacing: .02em; }
+  .tl .t { font: 12px var(--mono); color: var(--muted); }
+  .tl .s { font: 600 11px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .tl.done .s { color: var(--good); }
+  .tl.next { background: color-mix(in srgb, var(--hit-soft) 70%, transparent); }
+  .tl.next .s { color: var(--hit); }
+  .tl::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: transparent; }
+  .tl.done::after { background: var(--good); }
+  .tl.next::after { background: var(--hit); }
+
+  .hero-body { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+  .hero-body > * { padding: 18px 22px; }
+  .hero-body > * + * { border-left: 1px solid var(--line); }
+  .stage-name { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .podium3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; }
+  .pstep { border-radius: 4px; background: var(--ink); color: var(--bg); padding: 10px 10px 12px; display: grid; gap: 4px; }
+  .pstep.p1 { min-height: 128px; } .pstep.p2 { min-height: 108px; } .pstep.p3 { min-height: 94px; }
+  .pstep .pos { font: 600 12px var(--mono); opacity: .7; }
+  .pstep .c { font: 700 34px/1 var(--display); letter-spacing: .03em; display: flex; align-items: center; gap: 7px; }
+  .pstep .c::before { content: ""; width: 4px; height: 26px; background: var(--team); border-radius: 1px; }
+  .pstep .tm { font-size: 12px; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pstep .pp { font: 600 14px var(--mono); margin-top: auto; }
+  .pstep.p2 { order: -1; }
+  .field { margin-top: 16px; display: grid; gap: 4px; }
+  .frow { display: grid; grid-template-columns: 22px 4px 44px minmax(0, 1fr) 44px; gap: 10px; align-items: center; height: 24px; font-size: 13px; }
+  .frow .i { font: 12px var(--mono); color: var(--muted); text-align: right; }
+  .frow .stripe { width: 4px; height: 16px; border-radius: 1px; background: var(--team); }
+  .frow .c { font: 700 16px var(--display); letter-spacing: .03em; }
+  .frow .bar { height: 7px; background: var(--track); border-radius: 4px; overflow: hidden; display: block; }
+  .frow .bar i { display: block; height: 100%; background: var(--muted); border-radius: 4px; transform-origin: left; transition: transform 400ms var(--ease-out); }
+  .frow.top .bar i { background: var(--hit); }
+  .frow .v { font: 12px var(--mono); text-align: right; }
+  .more { margin-top: 8px; }
+
+  .moves { overflow-x: auto; }
+  table.mv { border-collapse: collapse; width: 100%; font-size: 13px; }
+  table.mv th { font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); text-align: right; padding: 6px 6px; white-space: nowrap; }
+  table.mv th:first-child { text-align: left; }
+  table.mv td { padding: 4px 6px; text-align: right; font: 12.5px var(--mono); font-variant-numeric: tabular-nums; }
+  table.mv td:first-child { text-align: left; font: 700 16px var(--display); letter-spacing: .03em; }
+  table.mv td.heat { background: color-mix(in srgb, var(--hit) calc(var(--h) * 70%), transparent); border-radius: 3px; }
+  table.mv td.heat.strong { color: var(--hit-ink); }
+  table.mv td.na { color: var(--muted); }
+
+  .sessions { border-top: 1px solid var(--line); padding: 16px 22px 20px; }
+  .stabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 10px 0 12px; }
+  .stab { border: 1px solid var(--line); background: transparent; border-radius: 3px; font: 600 12px var(--mono); padding: 6px 10px; }
+  .stab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .stab:disabled { opacity: .45; cursor: default; }
+  .sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 20px; }
+  .sgrid div { display: grid; grid-template-columns: 22px 4px 40px 1fr; gap: 8px; align-items: center; font-size: 13px; height: 24px; }
+  .sgrid .i { font: 12px var(--mono); color: var(--muted); text-align: right; }
+  .sgrid .stripe { width: 4px; height: 14px; background: var(--team); border-radius: 1px; }
+  .sgrid .c { font: 700 15px var(--display); letter-spacing: .03em; }
+  .sgrid .t { font: 12px var(--mono); color: var(--muted); text-align: right; }
+  .empty { color: var(--muted); font-size: 14px; }
+  .notice { font-size: 13px; color: var(--muted); margin: 12px 0 0; text-wrap: pretty; }
+  .notice b { color: var(--ink); }
+
+  /* intel + facts */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .card { padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+  .card h3 { font: 700 21px/1.1 var(--display); margin: 0; text-wrap: balance; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; text-wrap: pretty; }
+  .card .meta { display: flex; justify-content: space-between; gap: 8px; align-items: center; font: 12px var(--mono); color: var(--muted); }
+  .card .measure { font: 600 12.5px var(--mono); color: var(--ink); background: var(--track); border-radius: 3px; padding: 6px 8px; }
+  .card .measure.up { color: var(--good); } .card .measure.down { color: var(--live); }
+  .applied { color: var(--hit); font-weight: 600; }
+  .fact { border-left: 3px solid var(--hit); }
+
+  /* progress */
+  .progress { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .progress > .panel { padding: 16px 18px; }
+  .versus { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
+  .versus div { display: grid; gap: 2px; }
+  .versus .v { font: 700 30px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .versus .v small { font-size: 16px; color: var(--muted); }
+  .versus .s { font-size: 12px; color: var(--muted); }
+  .trials { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; }
+  .trials li { display: grid; grid-template-columns: 18px 1fr 70px; gap: 8px; font-size: 13.5px; align-items: center; }
+  .trials .d { font: 12px var(--mono); text-align: right; color: var(--muted); }
+  .trials li.kept { font-weight: 600; }
+  .trials li.kept .d { color: var(--good); }
+  .trials .mark { font: 700 12px var(--mono); color: var(--muted); }
+  .trials li.kept .mark { color: var(--good); }
+  table.plog { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px; }
+  table.plog th { font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+  table.plog td { padding: 8px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align: top; }
+  table.plog .codes { font: 600 13px var(--mono); }
+  .spark { width: 100%; height: 120px; display: block; margin-top: 10px; }
+
+  /* replay (from v1) */
+  .picker { display: grid; gap: 12px; }
+  .scoreboard { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 1.6fr); margin-bottom: 18px; }
+  .scoreboard > * { padding: 16px 18px; }
+  .scoreboard > * + * { border-left: 1px solid var(--line); }
+  .stat .k { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .stat .k::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+  .stat.model { --c: var(--hit); } .stat.grid { --c: var(--base); }
+  .stat .v { font: 700 44px/1 var(--display); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .stat .v small { font-size: 22px; color: var(--muted); font-weight: 600; }
+  .stat .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .seasons { display: grid; gap: 7px; align-content: center; }
+  .seasons .row { display: grid; grid-template-columns: 40px 1fr 70px; gap: 10px; align-items: center; font-size: 12px; }
+  .seasons .bars { display: grid; gap: 3px; }
+  .seasons .bar { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
+  .seasons .bar i { display: block; height: 100%; background: var(--c); border-radius: 3px; }
+  .seasons .bar.m { --c: var(--hit); } .seasons .bar.g { --c: var(--base); }
+  .seasons .n { color: var(--muted); text-align: right; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tab { border: 1px solid var(--line); background: transparent; border-radius: 4px; font: 600 18px/1 var(--display); padding: 8px 14px; letter-spacing: .02em; transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out); }
+  .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 6px 10px; font-size: 13px; font-weight: 500; transition: border-color 160ms var(--ease-out), transform 120ms var(--ease-out); }
+  .chip:active { transform: scale(0.97); }
+  .chip[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .pips { display: inline-flex; gap: 2px; }
+  .pips i { width: 6px; height: 6px; border-radius: 50%; background: var(--track); }
+  .pips i.on { background: var(--hit); }
+  .legend { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .race { margin-top: 18px; }
+  .race-head { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 20px; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+  .race-head h3 { font: 700 30px/1 var(--display); margin: 0; text-transform: uppercase; }
+  .race-head h3 span { color: var(--muted); font-weight: 500; }
+  .verdict { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .pill { font: 600 12px/1 var(--mono); padding: 7px 9px; border-radius: 3px; letter-spacing: .03em; background: var(--soft); color: var(--c); }
+  .pill.model { --soft: var(--hit-soft); --c: var(--hit); } .pill.grid { --soft: var(--base-soft); --c: var(--base); }
+  .reset { border: 1px solid var(--line); background: transparent; border-radius: 3px; font: 600 12px/1 var(--mono); padding: 7px 10px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); }
+  .tower { padding: 8px 0 12px; }
+  .tower-head, .drow { display: grid; align-items: center; gap: 10px; grid-template-columns: 30px 4px 46px minmax(0, 1fr) minmax(90px, 1.3fr) 48px 58px; padding: 0 20px; }
+  .tower-head { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-block: 10px; }
+  .tower-head .r { text-align: right; }
+  .drow { height: 34px; position: relative; }
+  .drow + .drow { border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+  .drow.moved { background: color-mix(in srgb, var(--hit-soft) 60%, transparent); }
+  .gpos { font: 600 14px var(--mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+  .stripe { width: 4px; height: 20px; border-radius: 1px; background: var(--team); }
+  .code { font: 700 19px/1 var(--display); letter-spacing: .03em; }
+  .team { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prob { display: grid; grid-template-columns: 1fr 40px; gap: 8px; align-items: center; }
+  .prob .track, .prob .fill { display: block; }
+  .prob .track { height: 8px; background: var(--track); border-radius: 4px; overflow: hidden; }
+  .prob .fill { height: 100%; background: var(--muted); border-radius: 4px; transform-origin: left center; transition: transform 320ms var(--ease-out), background-color 200ms var(--ease-out); }
+  .drow.pick .prob .fill { background: var(--hit); }
+  .prob .pct { font: 400 12px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+  .fin { font: 600 13px var(--mono); text-align: center; border-radius: 3px; padding: 3px 0; font-variant-numeric: tabular-nums; }
+  .fin.pod { background: var(--ink); color: var(--bg); }
+  .move { display: flex; gap: 2px; justify-content: flex-end; }
+  .move button { width: 26px; height: 26px; border: 1px solid var(--line); background: var(--panel); border-radius: 3px; display: grid; place-items: center; padding: 0; color: var(--muted); transition: transform 120ms var(--ease-out), color 120ms var(--ease-out); }
+  .move button:active { transform: scale(0.92); }
+  .move button:disabled { opacity: .35; cursor: default; }
+  @media (hover: hover) { .move button:not(:disabled):hover { color: var(--ink); border-color: var(--muted); } }
+  .move svg { width: 10px; height: 10px; fill: currentColor; }
+  .podiums { border-left: 1px solid var(--line); padding: 18px 20px; display: grid; gap: 18px; align-content: start; }
+  .pod h4 { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 8px; color: var(--muted); display: flex; justify-content: space-between; }
+  .pod ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pod li { border: 1px solid var(--line); border-radius: 4px; padding: 8px 8px 7px; display: grid; gap: 2px; }
+  .pod li .p { font: 600 11px var(--mono); color: var(--muted); }
+  .pod li .c { font: 700 22px/1 var(--display); letter-spacing: .03em; display: flex; align-items: center; gap: 6px; }
+  .pod li .c::before { content: ""; width: 3px; height: 16px; background: var(--team); border-radius: 1px; }
+  .pod li.hit { background: var(--hit); border-color: var(--hit); color: var(--hit-ink); }
+  .pod li.hit .p { color: inherit; opacity: .8; }
+  .pod.actual li { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .pod.actual li .p { color: inherit; opacity: .7; }
+  .whatif { font-size: 13px; color: var(--muted); margin: 0; text-wrap: pretty; }
+  .whatif b { color: var(--ink); font-weight: 600; }
+
+  .method { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+  .method h3 { font: 700 22px/1.05 var(--display); text-transform: uppercase; margin: 0 0 10px; }
+  .method p, .method li { max-width: 62ch; color: var(--muted); text-wrap: pretty; }
+  .method ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+  .method li::marker { color: var(--hit); }
+  .method b { color: var(--ink); }
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 860px) {
+    .hero-body, .cols, .progress, .method { grid-template-columns: 1fr; }
+    .hero-body > * + *, .podiums { border-left: 0; border-top: 1px solid var(--line); }
+    .timeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tl:nth-child(4) { border-left: 0; }
+    .tl:nth-child(n+4) { border-top: 1px solid var(--line); }
+    .scoreboard { grid-template-columns: 1fr 1fr; }
+    .seasons { grid-column: 1 / -1; border-left: 0 !important; border-top: 1px solid var(--line); }
+  }
+  @media (max-width: 560px) {
+    .hero-top, .hero-body > *, .sessions { padding-inline: 14px; }
+    .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tl:nth-child(n) { border-left: 0; border-top: 1px solid var(--line); }
+    .tl:nth-child(even) { border-left: 1px solid var(--line); }
+    .tl:nth-child(-n+2) { border-top: 0; }
+    .pstep .c { font-size: 26px; }
+    .countdown { text-align: left; }
+    .news-bar li { grid-template-columns: 1fr; gap: 0; }
+    .tower-head, .drow { grid-template-columns: 24px 4px 42px minmax(0, 1fr) 40px 56px; gap: 8px; padding: 0 12px; }
+    .tower-head .h-team, .drow .team { display: none; }
+    .race-head, .podiums { padding: 16px 12px; }
+    .versus .v { font-size: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; }
+  }
+</style>
+
+<header class="wrap top">
+  <div>
+    <div class="label">Formula 1 podium model · updates every race weekend</div>
+    <h1>Podium Lab</h1>
+  </div>
+  <div class="built"><span class="label">Last updated</span><b id="built"></b></div>
+</header>
+
+<div class="wrap panel news-bar" id="newsBar"></div>
+
+<main class="wrap">
+  <div class="panel race-hero" id="hero"></div>
+</main>
+
+<section class="wrap" aria-labelledby="intelH">
+  <h2 class="sec" id="intelH">Paddock news</h2>
+  <p class="sec-sub">Checked every day. Grid penalties go into the prediction. Everything else is context shown next to what the data measures, because upgrades and weather aren't in the model's training data.</p>
+  <div class="cards" id="intel"></div>
+</section>
+
+<section class="wrap" aria-labelledby="factsH">
+  <h2 class="sec" id="factsH">Numbers worth knowing</h2>
+  <p class="sec-sub">Worked out from the results data every time the page updates.</p>
+  <div class="cards" id="facts"></div>
+</section>
+
+<section class="wrap" aria-labelledby="progH">
+  <h2 class="sec" id="progH">How the model is improving</h2>
+  <p class="sec-sub" id="progSub"></p>
+  <div class="progress">
+    <div class="panel">
+      <div class="label">Latest feature search</div>
+      <div class="versus" id="versus"></div>
+      <ul class="trials" id="trials"></ul>
+    </div>
+    <div class="panel">
+      <div class="label">Live predictions log</div>
+      <table class="plog"><thead><tr><th>Race</th><th>Final pick</th><th>Actual</th><th>Score</th></tr></thead><tbody id="plog"></tbody></table>
+      <div class="label" style="margin-top:22px">Model accuracy over time (log loss, lower is better)</div>
+      <svg class="spark" id="spark" role="img" aria-label="Holdout log loss per model version"></svg>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" aria-labelledby="replayH">
+  <h2 class="sec" id="replayH">Replay every race</h2>
+  <p class="sec-sub">Each race from 2023 on, predicted by the current model using only earlier races. Move drivers on the grid to see how the prediction reacts.</p>
+  <div class="panel scoreboard" id="scoreboard"></div>
+  <div class="picker">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="chips" id="chips"></div>
+    <div class="legend"><span class="pips"><i class="on"></i><i class="on"></i><i></i></span> podium finishers the model called correctly</div>
+  </div>
+  <div class="panel race">
+    <div class="race-head">
+      <h3 id="raceTitle"></h3>
+      <div class="verdict">
+        <span class="pill model" id="pillModel"></span>
+        <span class="pill grid" id="pillGrid"></span>
+        <button class="reset" id="reset" type="button" hidden>Reset grid</button>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="tower" role="table" aria-label="Starting grid with podium probability">
+        <div class="tower-head" role="row">
+          <span class="r" role="columnheader">Grid</span><span></span>
+          <span role="columnheader">Driver</span><span class="h-team" role="columnheader">Team</span>
+          <span role="columnheader">Podium chance</span><span role="columnheader" style="text-align:center">Fin.</span>
+          <span class="r" role="columnheader">Move</span>
+        </div>
+        <div id="rows"></div>
+      </div>
+      <aside class="podiums">
+        <div class="pod" id="podModel"></div>
+        <div class="pod" id="podGrid"></div>
+        <div class="pod actual" id="podActual"></div>
+        <p class="whatif" id="whatif"></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="wrap method">
+  <div>
+    <h3>How a race weekend is predicted</h3>
+    <ul>
+      <li><b>Before the weekend:</b> form only, with no grid. Recent finishes, podium rate, team form and points this season.</li>
+      <li><b>After each practice:</b> best laps give a projected grid, weighted towards later sessions. Practice is noisy (fuel loads, test programmes), so it's blended with the form-only view: 35% after FP1, 50% after FP2, 60% after FP3.</li>
+      <li><b>After qualifying:</b> the real grid, with confirmed grid penalties applied. This is the final prediction.</li>
+      <li>The page checks for new data about 75 minutes after each session ends, and scores the prediction once the race result is published.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>How it keeps improving</h3>
+    <ul>
+      <li>Every new race result is added to the data and the model is retrained.</li>
+      <li>Each time, the feature search re-tests every engineered feature. It chooses using older races and reports the score on the most recent 16, so an improvement has to show up on races it didn't choose from.</li>
+      <li>The fixes from the original notebook still apply: races in calendar order, no future data in any feature, and rebrands (AlphaTauri → RB → Racing Bulls, Alfa Romeo → Sauber → Audi) tracked as one team.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="wrap">
+  Data: <a href="https://github.com/lk-nyoka/F1-Race-Predictions">lk-nyoka/F1-Race-Predictions</a> and the FastF1 API. News sources are linked on each card. This is a statistical model: rain, safety cars and retirements aren't in the data, so no prediction here is a sure thing.
+</footer>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("data").textContent);
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const TEAM = {
+    "Red Bull Racing": "#3671c6", "Ferrari": "#e8002d", "Mercedes": "#1fc9ad", "McLaren": "#ff8000",
+    "Aston Martin": "#229971", "Alpine": "#0093cc", "Williams": "#3fa9f5", "AlphaTauri": "#5e8faa",
+    "RB": "#6692ff", "Racing Bulls": "#6692ff", "Haas F1 Team": "#9aa0a6", "Alfa Romeo": "#b12039",
+    "Kick Sauber": "#3cc93c", "Audi": "#8c8c8c", "Cadillac": "#c9a227"
+  };
+  const tc = (t) => TEAM[t] || "var(--muted)";
+  const pct = (p) => p < 0.005 ? "<1%" : `${Math.round(p * 100)}%`;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const fmtWhen = (iso, opts) => new Date(iso).toLocaleString(undefined, opts || { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+  $("built").textContent = fmtWhen(DATA.built.replace("Z", "") + "Z");
+
+  // ---------- since your last visit ----------
+  (function sinceLastVisit() {
+    const lastSeen = store.get("podiumlab.seen");
+    const log = [...DATA.changelog].reverse();
+    const fresh = lastSeen ? log.filter(e => e.ts > lastSeen) : [];
+    const list = fresh.length ? fresh : log.slice(0, 5);
+    const head = fresh.length
+      ? `<span><span class="newdot"></span><b>${fresh.length} update${fresh.length > 1 ? "s" : ""} since your last visit</b></span>`
+      : `<span class="label">${lastSeen ? "No new updates since your last visit · latest" : "Latest updates"}</span>`;
+    $("newsBar").innerHTML = `<header>${head}</header><ul>${list.slice(0, 8).map(e =>
+      `<li><span class="when">${fmtWhen(e.ts, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+       <span><span class="kind ${esc(e.kind)}">${esc(e.kind)}</span>${esc(e.text)}</span></li>`).join("")}</ul>`;
+    const newest = log[0] && log[0].ts;
+    if (newest) store.set("podiumlab.seen", newest);
+  })();
+
+  // ---------- next race ----------
+  const L = DATA.live;
+  let stageIdx = L ? L.stages.length - 1 : 0;
+  function renderHero() {
+    if (!L) { $("hero").innerHTML = `<div class="hero-top"><h2>Season complete</h2></div>`; return; }
+    const now = Date.now();
+    const raceT = Date.parse(L.raceUtc);
+    const sess = [...L.sessions.map(s => ({ name: s.name, t: s.startUtc ? Date.parse(s.startUtc) : null, loaded: s.loaded })),
+                  { name: "Race", t: raceT, loaded: false }];
+    const nextS = sess.find(s => !s.loaded && s.t && s.t + 60 * 60e3 > now);
+    let cd = "";
+    if (nextS) {
+      const ms = nextS.t - now;
+      if (ms > 0) {
+        const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+        cd = `<div class="label">${esc(nextS.name.replace("Practice ", "FP"))} starts in</div><div class="big">${d ? d + "d " : ""}${h}h ${String(m).padStart(2, "0")}m</div>`;
+      } else {
+        cd = `<div class="label live-dot">${esc(nextS.name.replace("Practice ", "FP"))} on track now</div><div class="big">Live</div>`;
+      }
+    }
+    const tl = sess.map(s => {
+      const cls = s.loaded ? "done" : s === nextS ? "next" : "";
+      const st = s.loaded ? "Data in" : s === nextS ? (s.t < now ? "Running" : "Next") : s.t && s.t < now ? "Waiting for data" : "Upcoming";
+      return `<div class="tl ${cls}"><span class="n">${esc(s.name.replace("Practice ", "FP").replace("Qualifying", "Quali"))}</span>
+        <span class="t">${s.t ? fmtWhen(new Date(s.t).toISOString(), { weekday: "short", hour: "2-digit", minute: "2-digit" }) : ""}</span>
+        <span class="s">${st}</span></div>`;
+    }).join("");
+
+    const st = L.stages[stageIdx];
+    const dr = st.drivers;
+    const pod = [0, 1, 2].map(i => {
+      const x = dr[i];
+      return `<div class="pstep p${i + 1}" style="--team:${tc(x.team)}"><span class="pos">P${i + 1}</span>
+        <span class="c">${esc(x.code)}</span><span class="tm">${esc(x.team)}</span><span class="pp">${pct(x.p)}</span></div>`;
+    }).join("");
+    const showAll = $("hero").dataset.all === "1";
+    const field = dr.slice(0, showAll ? dr.length : 10).map((x, i) =>
+      `<div class="frow ${i < 3 ? "top" : ""}" style="--team:${tc(x.team)}"><span class="i">${i + 1}</span><span class="stripe"></span>
+        <span class="c">${esc(x.code)}</span><span class="bar"><i style="transform:scaleX(${Math.max(x.p, .004)})"></i></span><span class="v">${pct(x.p)}</span></div>`).join("");
+
+    // movement table across stages
+    const top = dr.slice(0, 8).map(x => x.code);
+    const byStage = L.stages.map(s => Object.fromEntries(s.drivers.map(x => [x.code, x.p])));
+    const mv = `<table class="mv"><thead><tr><th>Driver</th>${L.stages.map(s => `<th>${esc(s.label.replace("After ", "").replace("Before the weekend", "Pre"))}</th>`).join("")}</tr></thead>
+      <tbody>${top.map(c => `<tr><td>${esc(c)}</td>${byStage.map(m => m[c] == null ? `<td class="na">–</td>` :
+        `<td class="heat ${m[c] > .55 ? "strong" : ""}" style="--h:${m[c].toFixed(3)}">${pct(m[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+
+    const loadedS = L.sessions.filter(s => s.loaded && s.order);
+    let si = +($("hero").dataset.sess ?? loadedS.length - 1);
+    if (!(si >= 0 && si < loadedS.length)) si = loadedS.length - 1;
+    const sOrder = loadedS[si];
+    const sessHTML = `<div class="label">Session results</div>
+      <div class="stabs" role="tablist">${L.sessions.map(s => {
+        const k = loadedS.indexOf(s);
+        return `<button class="stab" type="button" role="tab" data-si="${k}" ${k < 0 ? "disabled" : ""} aria-selected="${k === si}">${esc(s.name.replace("Practice ", "FP"))}</button>`;
+      }).join("")}</div>
+      ${sOrder ? `<div class="sgrid">${sOrder.order.map((x, i) => `<div style="--team:${tc(x.team)}"><span class="i">${i + 1}</span><span class="stripe"></span><span class="c">${esc(x.code)}</span>
+        <span class="t">${i === 0 || x.gap == null ? esc(x.time || "") : "+" + x.gap.toFixed(2) + "%"}</span></div>`).join("")}</div>`
+        : `<p class="empty">No session data yet. FP1 results appear here about 75 minutes after the session ends.</p>`}`;
+
+    const pens = Object.entries(L.penalties || {});
+    const notes = [];
+    if (L.newVenue) notes.push(`<b>New venue in the data:</b> no driver has a ${esc(L.location)} record here, so circuit history is neutral this weekend.`);
+    if (pens.length) notes.push(`<b>Grid penalties applied after qualifying:</b> ${pens.map(([c, n]) => `${esc(c)} +${n} places`).join(", ")}.`);
+
+    $("hero").innerHTML = `
+      <div class="hero-top">
+        <div><div class="label live-dot">Next race · Round ${L.round}</div>
+          <h2>${esc(L.name)}</h2>
+          <div class="where">${esc(L.location)}${L.country && !L.location.includes(L.country) ? ` · run as the ${esc(L.country)} GP` : ""} · ${fmtWhen(L.raceUtc)}</div></div>
+        <div class="countdown">${cd}</div>
+      </div>
+      <div class="timeline">${tl}</div>
+      <div class="hero-body">
+        <div>
+          <div class="stage-name"><span class="label">Predicted podium · ${esc(st.label.toLowerCase())}</span>
+            ${L.stages.length > 1 ? `<span class="stabs" style="margin:0">${L.stages.map((s, i) => `<button class="stab" type="button" data-stage="${i}" aria-selected="${i === stageIdx}">${esc(s.label.replace("After ", "").replace("Before the weekend", "Pre"))}</button>`).join("")}</span>` : ""}
+          </div>
+          <div class="podium3">${pod}</div>
+          <div class="field">${field}</div>
+          <button class="linkbtn more" type="button" id="moreBtn">${showAll ? "Show top 10" : `Show all ${dr.length} drivers`}</button>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom:10px">How the prediction has moved</div>
+          <div class="moves">${mv}</div>
+          <p class="notice">${L.stages.length === 1 ? "Only the pre-weekend view so far. A new column is added after each session." : "Each column is the podium chance after that session."}</p>
+          ${notes.map(n => `<p class="notice">${n}</p>`).join("")}
+        </div>
+      </div>
+      <div class="sessions">${sessHTML}</div>`;
+  }
+  $("hero").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.stage != null) { stageIdx = +b.dataset.stage; renderHero(); }
+    else if (b.dataset.si != null && !b.disabled) { $("hero").dataset.sess = b.dataset.si; renderHero(); }
+    else if (b.id === "moreBtn") { $("hero").dataset.all = $("hero").dataset.all === "1" ? "0" : "1"; renderHero(); }
+  });
+  renderHero();
+  setInterval(renderHero, 60e3);
+
+  // ---------- intel ----------
+  (function intel() {
+    const items = (DATA.intel.items || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+    const trendByTeam = {};
+    if (L) {
+      const teamOf = Object.fromEntries(L.stages[0].drivers.map(x => [x.code, x.team]));
+      Object.entries(L.features).forEach(([c, f]) => { if (!(teamOf[c] in trendByTeam)) trendByTeam[teamOf[c]] = f.teamTrend; });
+    }
+    $("intel").innerHTML = items.length ? items.map(it => {
+      let measure = "";
+      if (it.kind === "upgrade" && it.team in trendByTeam) {
+        const v = trendByTeam[it.team];
+        measure = `<div class="measure ${v > 0.5 ? "up" : v < -0.5 ? "down" : ""}">Measured trend: ${v >= 0 ? "+" : ""}${v.toFixed(1)} pts per car per race, last 3 races compared with the 3 before</div>`;
+      }
+      return `<article class="panel card">
+        <div class="meta"><span><span class="kind ${esc(it.kind)}">${esc(it.kind)}</span>${esc(it.team || "")}</span><span>${esc(it.date)}</span></div>
+        <h3>${esc(it.title)}</h3><p>${esc(it.summary)}</p>${measure}
+        <div class="meta">${it.applied ? `<span class="applied">Applied to prediction</span>` : "<span>Context only</span>"}
+          ${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.source || "Source")}</a>` : ""}</div>
+      </article>`;
+    }).join("") : `<p class="empty">No news collected yet.</p>`;
+  })();
+
+  // ---------- facts ----------
+  $("facts").innerHTML = DATA.facts.map(f => `<article class="panel card fact">
+    <div class="meta"><span class="label">${esc(f.tag)}</span></div><h3>${esc(f.title)}</h3><p>${esc(f.body)}</p></article>`).join("");
+
+  // ---------- progress ----------
+  (function progress() {
+    const s = DATA.search, H = s.holdout_races;
+    const b = s.baseline.holdout, c = s.champion.holdout;
+    $("progSub").textContent = `Retrained on every new result. The feature search chooses using ${s.select_races} older races and is scored on the latest ${H}, races it didn't choose from.`;
+    $("versus").innerHTML = `
+      <div><span class="s">Notebook features</span><span class="v">${b.hits}<small>/${H * 3}</small></span><span class="s">log loss ${b.logloss}</span></div>
+      <div><span class="s">Current model</span><span class="v" style="color:var(--hit)">${c.hits}<small>/${H * 3}</small></span><span class="s">log loss ${c.logloss}</span></div>
+      <div><span class="s">Front 3 on grid</span><span class="v" style="color:var(--base)">${c.grid}<small>/${H * 3}</small></span><span class="s">no probabilities</span></div>`;
+    const t0 = s.trials[0].select;
+    $("trials").innerHTML = s.trials.map((t, i) => {
+      const lbl = i === 0 ? t.change : t.change;
+      const delta = i === 0 ? t.select.toFixed(4) : ((t.select - t0) >= 0 ? "+" : "") + (t.select - t0).toFixed(4);
+      return `<li class="${t.kept ? "kept" : ""}"><span class="mark">${t.kept ? "✓" : "·"}</span><span>${esc(lbl)}</span><span class="d">${delta}</span></li>`;
+    }).join("") + `<li style="margin-top:6px;color:var(--muted);font-size:12px"><span></span><span>Numbers are change in log loss against the starting point on the selection races. Lower is better; ✓ means kept.</span><span></span></li>`;
+
+    const rows = DATA.predLog.slice().reverse();
+    $("plog").innerHTML = rows.map(r => {
+      const f = r.stages[r.stages.length - 1];
+      return `<tr><td>${esc(r.name.replace(" Grand Prix", ""))} ${r.year}<br><span class="label" style="font-size:10px">${esc(f.label)}</span></td>
+        <td class="codes">${f.top3.join(" ")}</td><td class="codes">${r.actual ? r.actual.join(" ") : "–"}</td>
+        <td class="codes">${r.actual ? f.hits + "/3" : "pending"}</td></tr>`;
+    }).join("") || `<tr><td colspan="4" class="empty">First live prediction in progress.</td></tr>`;
+
+    // log loss over model versions
+    const hist = DATA.scoreHistory;
+    const svg = $("spark");
+    const W = 400, Hh = 120, P = { l: 44, r: 12, t: 12, b: 22 };
+    svg.setAttribute("viewBox", `0 0 ${W} ${Hh}`);
+    const vals = hist.flatMap(h => [h.champion.holdout.logloss, h.baseline.holdout.logloss]);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = Math.max((hi - lo) * .3, .002); lo -= pad; hi += pad;
+    const x = i => hist.length === 1 ? (P.l + W - P.r) / 2 : P.l + i * (W - P.l - P.r) / (hist.length - 1);
+    const y = v => P.t + (hi - v) / (hi - lo) * (Hh - P.t - P.b);
+    const line = (k, col) => {
+      const pts = hist.map((h, i) => [x(i), y(h[k].holdout.logloss)]);
+      return (pts.length > 1 ? `<polyline fill="none" stroke="${col}" stroke-width="2" points="${pts.map(p => p.join(",")).join(" ")}"/>` : "") +
+        pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 4 : 2.5}" fill="${col}"/>`).join("");
+    };
+    const ticks = [hi - pad * .5, (hi + lo) / 2, lo + pad * .5];
+    svg.innerHTML = ticks.map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>
+        <text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--muted)">${v.toFixed(3)}</text>`).join("") +
+      line("baseline", "var(--base)") + line("champion", "var(--hit)") +
+      `<text x="${W - P.r}" y="${Hh - 6}" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--muted)">${hist.length} version${hist.length > 1 ? "s" : ""} · latest on ${hist[hist.length - 1].races} races</text>
+       <text x="${P.l}" y="${Hh - 6}" font-size="10" font-family="var(--mono)" fill="var(--hit)">● current model</text>
+       <text x="${P.l + 100}" y="${Hh - 6}" font-size="10" font-family="var(--mono)" fill="var(--base)">● notebook features</text>`;
+  })();
+
+  // ---------- replay ----------
+  const races = DATA.replay;
+  const sigmoid = (z) => 1 / (1 + Math.exp(-z));
+  function score(race, d) {
+    const m = race.model, lg = Math.log(d.grid);
+    let z = m.b;
+    m.feats.forEach((f, i) => {
+      const v = f === "LogGrid" ? lg : f === "GridXTeam" ? lg * d.teamForm : d.x[f];
+      z += m.w[i] * (v - m.mu[i]) / m.sd[i];
+    });
+    return sigmoid(z);
+  }
+  const top3By = (list, key, dir) => [...list].sort((a, b) => dir * (a[key] - b[key])).slice(0, 3);
+  const years = [...new Set(races.map(r => r.year))];
+
+  (function scoreboard() {
+    const spots = races.length * 3;
+    const m = races.reduce((a, r) => a + r.hits.model, 0), g = races.reduce((a, r) => a + r.hits.grid, 0);
+    const rows = years.map(y => {
+      const rs = races.filter(r => r.year === y), n = rs.length * 3;
+      const mm = rs.reduce((a, r) => a + r.hits.model, 0), gg = rs.reduce((a, r) => a + r.hits.grid, 0);
+      return `<div class="row"><span class="mono">${y}</span><div class="bars"><div class="bar m"><i style="width:${mm / n * 100}%"></i></div>
+        <div class="bar g"><i style="width:${gg / n * 100}%"></i></div></div><span class="n mono">${mm}·${gg}/${n}</span></div>`;
+    }).join("");
+    $("scoreboard").innerHTML = `
+      <div class="stat model"><div class="k">Model</div><div class="v">${m}<small>/${spots}</small></div><div class="sub">${(m / spots * 100).toFixed(1)}% of podium spots, ${races.length} races</div></div>
+      <div class="stat grid"><div class="k">Front 3 on grid</div><div class="v">${g}<small>/${spots}</small></div><div class="sub">${(g / spots * 100).toFixed(1)}% of podium spots</div></div>
+      <div class="seasons" aria-label="Podium spots called per season, model then grid">${rows}</div>`;
+  })();
+
+  let raceIdx = races.length - 1;
+  const saved = store.get("podiumlab.race2");
+  if (saved !== null && Number.isInteger(+saved) && +saved >= 0 && +saved < races.length) raceIdx = +saved;
+  let year = races[raceIdx].year, order = [], original = [];
+
+  function renderTabs() {
+    $("tabs").innerHTML = years.map(y => `<button class="tab" role="tab" type="button" aria-selected="${y === year}" data-year="${y}">${y}</button>`).join("");
+  }
+  function renderChips() {
+    $("chips").innerHTML = races.map((r, i) => r.year !== year ? "" :
+      `<button class="chip" type="button" data-i="${i}" aria-pressed="${i === raceIdx}" aria-label="${esc(r.name)} ${r.year}, model called ${r.hits.model} of 3">
+        ${esc(r.name)}<span class="pips">${[0, 1, 2].map(k => `<i class="${k < r.hits.model ? "on" : ""}"></i>`).join("")}</span></button>`).join("");
+  }
+  $("tabs").addEventListener("click", e => {
+    const b = e.target.closest("[data-year]"); if (!b) return;
+    year = +b.dataset.year; renderTabs();
+    const inYear = races.map((r, i) => [r, i]).filter(([r]) => r.year === year);
+    selectRace(inYear[inYear.length - 1][1]);
+  });
+  $("chips").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) selectRace(+b.dataset.i); });
+
+  function selectRace(i) {
+    raceIdx = i; store.set("podiumlab.race2", String(i));
+    original = races[i].drivers.map(d => d.code); order = [...original];
+    $("rows").innerHTML = ""; renderChips(); render(false);
+  }
+  const up = `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 2 9.5 8h-9z"/></svg>`;
+  const down = `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 8 .5 2h9z"/></svg>`;
+  function podHTML(title, arr, actualSet, tag) {
+    const hits = actualSet ? arr.filter(d => actualSet.has(d.code)).length : null;
+    return `<h4><span>${title}</span>${hits === null ? "" : `<span>${hits}/3</span>`}</h4><ol>${arr.map((d, k) =>
+      `<li class="${actualSet && actualSet.has(d.code) ? "hit" : ""}" style="--team:${tc(d.team)}"><span class="p">${tag(d, k)}</span><span class="c">${esc(d.code)}</span></li>`).join("")}</ol>`;
+  }
+  function render(animate) {
+    const r = races[raceIdx];
+    const byCode = Object.fromEntries(r.drivers.map(d => [d.code, d]));
+    const list = order.map((c, k) => ({ ...byCode[c], grid: k + 1, origGrid: byCode[c].grid }));
+    list.forEach(d => d.p = score(r, d));
+    const edited = order.some((c, k) => c !== original[k]);
+    const picks = top3By(list, "p", -1), pickSet = new Set(picks.map(d => d.code));
+    const gridPicks = list.slice(0, 3);
+    const actual = top3By(list.filter(d => d.finish <= 3), "finish", 1), actualSet = new Set(actual.map(d => d.code));
+    $("raceTitle").innerHTML = `${esc(r.name)} <span>${r.year}</span>`;
+    $("pillModel").textContent = `Model ${picks.filter(d => actualSet.has(d.code)).length}/3${edited ? " · your grid" : ""}`;
+    $("pillGrid").textContent = `Grid ${gridPicks.filter(d => actualSet.has(d.code)).length}/3`;
+    $("reset").hidden = !edited;
+    const rowsEl = $("rows");
+    const before = new Map([...rowsEl.children].map(el => [el.dataset.code, el.getBoundingClientRect().top]));
+    list.forEach((d, k) => {
+      let el = rowsEl.querySelector(`[data-code="${d.code}"]`);
+      if (!el) {
+        el = document.createElement("div"); el.className = "drow"; el.setAttribute("role", "row"); el.dataset.code = d.code;
+        el.innerHTML = `<span class="gpos" role="cell"></span><span class="stripe"></span><span class="code" role="cell"></span><span class="team" role="cell"></span>
+          <span class="prob" role="cell"><span class="track"><span class="fill"></span></span><span class="pct"></span></span><span class="fin" role="cell"></span>
+          <span class="move" role="cell"><button type="button" data-dir="-1">${up}</button><button type="button" data-dir="1">${down}</button></span>`;
+        el.querySelector(".fill").style.transform = "scaleX(0)";
+      }
+      rowsEl.appendChild(el);
+      el.style.setProperty("--team", tc(d.team));
+      el.classList.toggle("pick", pickSet.has(d.code));
+      el.classList.toggle("moved", d.grid !== d.origGrid);
+      el.querySelector(".gpos").textContent = d.grid;
+      el.querySelector(".code").textContent = d.code;
+      el.querySelector(".team").textContent = d.team;
+      el.querySelector(".pct").textContent = pct(d.p);
+      const fin = el.querySelector(".fin"); fin.textContent = `P${d.finish}`; fin.className = "fin" + (d.finish <= 3 ? " pod" : "");
+      const [bu, bd] = el.querySelectorAll(".move button");
+      bu.disabled = k === 0; bd.disabled = k === list.length - 1;
+      bu.setAttribute("aria-label", `Move ${d.code} up to P${k}`); bd.setAttribute("aria-label", `Move ${d.code} down to P${k + 2}`);
+    });
+    requestAnimationFrame(() => list.forEach(d => { rowsEl.querySelector(`[data-code="${d.code}"] .fill`).style.transform = `scaleX(${Math.max(d.p, 0.004)})`; }));
+    if (animate && !reduced.matches) {
+      [...rowsEl.children].forEach(el => {
+        const prev = before.get(el.dataset.code); if (prev == null) return;
+        const dy = prev - el.getBoundingClientRect().top; if (Math.abs(dy) < 1) return;
+        el.animate([{ transform: `translateY(${dy}px)` }, { transform: "translateY(0)" }], { duration: 260, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+      });
+    }
+    $("podModel").innerHTML = podHTML("Model picks", picks, actualSet, d => pct(d.p));
+    $("podGrid").innerHTML = podHTML("Front 3 on grid", gridPicks, actualSet, d => `P${d.grid} start`);
+    $("podActual").innerHTML = podHTML("Actual podium", actual, null, d => `P${d.finish} · from P${d.origGrid}`);
+    if (!edited) $("whatif").textContent = "Use the arrows to move a driver up or down the grid. The model re-scores the whole field; the actual result stays as it happened.";
+    else {
+      const key = list.filter(d => d.grid !== d.origGrid).sort((a, b) => Math.abs(b.grid - b.origGrid) - Math.abs(a.grid - a.origGrid))[0];
+      $("whatif").innerHTML = `With <b>${esc(key.code)}</b> starting P${key.grid} instead of P${key.origGrid}, the model puts their podium chance at <b>${pct(key.p)}</b>.`;
+    }
+  }
+  $("rows").addEventListener("click", e => {
+    const b = e.target.closest("button[data-dir]"); if (!b || b.disabled) return;
+    const code = b.closest(".drow").dataset.code, k = order.indexOf(code), j = k + +b.dataset.dir;
+    if (j < 0 || j >= order.length) return;
+    [order[k], order[j]] = [order[j], order[k]];
+    render(true);
+    const same = $("rows").querySelector(`[data-code="${code}"] button[data-dir="${b.dataset.dir}"]`);
+    if (same && !same.disabled) same.focus();
+  });
+  $("reset").addEventListener("click", () => { order = [...original]; render(true); });
+  renderTabs(); selectRace(raceIdx);
+})();
+</script>
